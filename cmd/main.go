@@ -14,6 +14,8 @@ func main() {
 
 	err := server.Run()
 
+
+
 	if err != nil {
 		log.Fatal("There was a error runing",err)
 	}

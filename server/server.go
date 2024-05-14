@@ -2,7 +2,10 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/skradiansys/go/db"
 )
 
 type APIServer struct {
@@ -16,6 +19,12 @@ func NewApiServer(addr string) *APIServer {
 }
 
 func (s *APIServer) Run() error {
+	_,dbError := db.NewDb()
+
+	if dbError != nil {
+		log.Fatal("Something wrong with the db")
+	}
+
 	router := http.NewServeMux()
 
 	router.HandleFunc("/",func(w http.ResponseWriter, r *http.Request) {
