@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/skradiansys/go/db"
+	"github.com/skradiansys/go/internals/user"
 )
 
 type APIServer struct {
@@ -19,7 +20,7 @@ func NewApiServer(addr string) *APIServer {
 }
 
 func (s *APIServer) Run() error {
-	_,dbError := db.NewDb()
+	postgresDb,dbError := db.NewDb()
 
 	if dbError != nil {
 		log.Fatal("Something wrong with the db")
@@ -27,9 +28,13 @@ func (s *APIServer) Run() error {
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("/",func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("working"))
-	})
+	userStore := user.NewStore(postgresDb)
+	userService := user.NewService(userStore)
+	userHandler := user.NewHandler(userService)
+	userHandler.RegisterRoutes(router)
+
+	v1 := http.NewServeMux()
+	v1.Handle("/api/v1/",http.StripPrefix("/v1",router))
 
 	server:= http.Server{
 		Addr: s.addr,
