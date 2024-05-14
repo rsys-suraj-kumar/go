@@ -4,11 +4,13 @@ import "net/http"
 
 
 type Handler struct {
-	
+	service *Service
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(s *Service) *Handler {
+	return &Handler{
+		s,
+	}
 }
 
 func (h *Handler) RegisterRoutes(router *http.ServeMux) {

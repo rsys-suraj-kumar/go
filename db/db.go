@@ -26,6 +26,7 @@ func NewDb() (*sql.DB,error){
 
 	fmt.Println("Sererv db")
 
+	defer db.Close()
 	
 	return db,nil
 }
