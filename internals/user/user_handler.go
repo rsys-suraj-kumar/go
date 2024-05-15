@@ -63,6 +63,8 @@ func (h *Handler) login(w http.ResponseWriter,r *http.Request){
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
+	
+
 	if email == "" || password == "" {
 		http.Error(w,"email and password both are required",http.StatusBadRequest)
 		return
