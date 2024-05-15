@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -17,28 +18,36 @@ func NewStore(db *sql.DB) *Store{
 }
 
 func (s *Store) createUser(ctx context.Context, user *User) (*User,error){
-	var userId int
-	query := `INSERT INTO users(username,email,password) VALUES ($1, $2, $3) RETURNING id`
 
-	err := s.db.QueryRowContext(ctx,query,user.Username,user.Email,user.Password).Scan(&userId)
+	fmt.Print("user detils", user)
+
+	var userId int
+	query := `INSERT INTO "users" (username, email, password) VALUES ($1, $2, $3) returning id`
+
+	err := s.db.QueryRowContext(ctx,query, user.Username, user.Email , user.Password).Scan(&userId)
+
 
 	if err != nil {
-		log.Fatal("something wrong with the query")
+		log.Fatal(err.Error())
 		return nil,err
 	}
+
+
 	user.ID = int64(userId)
 	return user,nil
 }
 
 func (s *Store) getUserByEmail(ctx context.Context,email string) (*User,error) {
-	u :=User{}
+	u := User{}
 
-	query:=`SELECT id,username,email,password FROM users WHERE email = $1`
+	fmt.Print("Email " , email)
 
-	err := s.db.QueryRowContext(ctx,query,email).Scan(&u.ID,&u.Username,&u.Email,&u.Password)
+	query:=`SELECT * FROM "users" WHERE email = $1`
+
+	err := s.db.QueryRowContext(ctx,query,email).Scan(&u.ID, &u.Username, &u.Email, &u.Password)
 
 	if err != nil {
-		log.Fatal("something wrong with the query")
+		log.Fatal(err.Error())
 		return nil,err
 	}
 	return &u,nil

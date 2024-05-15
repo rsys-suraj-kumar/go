@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -70,10 +71,11 @@ func (h *Handler) login(w http.ResponseWriter,r *http.Request){
 		return
 	}
 
-	u,loginErr := h.service.login(r.Context(),&LoginUserReq{Email: email,Password: password})
+	u,loginErr := h.service.login(r.Context(), LoginUserReq{Email: email,Password: password})
 
 	if loginErr != nil {
-		http.Error(w,loginErr.Error(),http.StatusBadRequest)
+		log.Println(loginErr.Error())
+		http.Error(w, loginErr.Error(), http.StatusBadRequest)
 		return
 	}
 

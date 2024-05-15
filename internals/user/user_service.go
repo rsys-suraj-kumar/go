@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"time"
 
@@ -64,7 +65,7 @@ type MyJwtClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (s *Service) login(c context.Context, req *LoginUserReq) (*LoginUserRes,error){
+func (s *Service) login(c context.Context, req LoginUserReq) (*LoginUserRes,error){
 	ctx, cancel := context.WithTimeout(c,s.timeout)
 
 	defer cancel()
@@ -77,8 +78,8 @@ func (s *Service) login(c context.Context, req *LoginUserReq) (*LoginUserRes,err
 
 	passError := utils.CheckPassword(req.Password,u.Password)
 
-if passError != nil {
-		return nil, err
+	if passError != nil {
+		return nil, errors.New("password does not match")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,MyJwtClaims{
