@@ -7,6 +7,7 @@ import (
 
 	"github.com/skradiansys/go/db"
 	"github.com/skradiansys/go/internals/user"
+	"github.com/skradiansys/go/middleware"
 )
 
 type APIServer struct {
@@ -34,11 +35,16 @@ func (s *APIServer) Run() error {
 	userHandler.RegisterRoutes(router)
 
 	v1 := http.NewServeMux()
-	v1.Handle("/api/v1/",http.StripPrefix("/v1",router))
+	v1.Handle("/api/v1/",http.StripPrefix("/api/v1",router))
+
+	middlewareChain := middleware.MiddlewareChain(
+		middleware.ContextMidleware,
+		middleware.Logging,
+	)
 
 	server:= http.Server{
 		Addr: s.addr,
-		Handler: router,
+		Handler: middlewareChain(v1),
 	}
 
 	fmt.Println("Server is runing on port: ",s.addr);
